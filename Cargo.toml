@@ -1,0 +1,14 @@
+[package]
+name = "github-actions-monitor"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.87"
+license = "MIT"
+description = "A local, read-only GitHub CLI dashboard for personal and organization self-hosted runners"
+
+[dependencies]
+serde_json = "=1.0.154"
+
+[profile.release]
+lto = true
+strip = true

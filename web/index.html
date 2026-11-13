@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Self-hosted GitHub Actions runners and job queues across your personal repositories and organizations.">
+  <title>Runner Watch · GitHub Actions Monitor</title>
+  <link rel="stylesheet" href="/app.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <main>
+    <header class="masthead">
+      <a class="brand" href="/" aria-label="Runner Watch home"><span class="brand-icon" aria-hidden="true">↗</span> runner<span class="brand-light">watch</span></a>
+      <span class="local-label"><span class="dot"></span> LOCAL / READ ONLY</span>
+    </header>
+    <section class="intro">
+      <div><p class="eyebrow">GITHUB ACTIONS / SELF-HOSTED</p><h1>Your runners. <span>At a glance.</span></h1><p class="subtitle">See what’s available, what’s working, and what’s waiting.</p></div>
+      <div class="refresh-indicator"><span id="live-dot" class="dot muted"></span><span id="refresh-label" role="status">Not connected</span><span class="interval">5s refresh</span></div>
+    </section>
+    <section class="connection-panel" aria-labelledby="connect-title">
+      <div class="panel-heading"><h2 id="connect-title">Connect your account</h2><span class="small">Credentials stay on your machine.</span></div>
+      <form id="connect-form" method="post" action="/api/snapshot">
+        <label>GitHub username <input id="username" name="username" required maxlength="39" autocomplete="username" placeholder="your-username" spellcheck="false"></label>
+        <label>Personal token <span class="optional">optional with gh login</span><input id="token" name="token" type="password" maxlength="4096" autocomplete="off" placeholder="Use your existing gh session"></label>
+        <label>Repositories <span class="optional">optional</span><input id="repos" name="repos" placeholder="All accessible, or repo-one, org/repo-two" autocomplete="off" spellcheck="false"></label>
+        <button id="connect" class="primary" type="submit">Connect account <span aria-hidden="true">↗</span></button>
+      </form>
+      <div class="connection-footer"><p>Already using GitHub CLI? Run <code>gh auth login</code>, then enter your username above.</p><button id="help-toggle" class="text-button" aria-expanded="false" aria-controls="help">Connection guide <span aria-hidden="true">↓</span></button></div>
+      <div id="help" hidden>
+        <ol><li>Install Rust 1.87+ and GitHub CLI 2.49+ on this machine. Start this app with <code>cargo run --locked</code>.</li><li>Run <code>gh auth login --hostname github.com --web --scopes repo,read:org,admin:org</code> in a terminal and complete GitHub’s sign-in. For an existing login, add organization access with <code>gh auth refresh --hostname github.com --scopes read:org,admin:org</code>. Check it with <code>gh auth status</code>.</li><li>Enter your personal GitHub username, even for organization runners. Leave the token blank to use your CLI session. A fine-grained token needs <strong>Actions: read</strong> and <strong>Administration: read</strong> for repositories. For organization runners, choose the organization as the token’s resource owner and grant <strong>Self-hosted runners: read</strong>. Organization approval, an appropriate organization role, and SSO authorization may be required.</li><li>Click Connect account. Personal and accessible organization repositories are included automatically. Optional repository names restrict polling; use <code>org/repo</code> for organization repositories. Organization runners are shared pools, counted once.</li></ol>
+        <p>The app makes read-only requests through <code>gh</code>. It never saves a token to disk, cookies, or browser storage. Disconnect clears the form and in-memory connection. Your existing CLI login is managed separately by GitHub CLI.</p>
+      </div>
+    </section>
+    <div id="error" class="notice error" role="alert" hidden></div>
+    <div id="warnings" class="notice warning" role="status" hidden></div>
+    <section class="stats" aria-label="Runner and job totals">
+      <div class="stat"><span class="stat-label"><span class="dot green"></span> Available</span><strong id="available">—</strong><span class="stat-detail">online &amp; idle</span></div>
+      <div class="stat"><span class="stat-label"><span class="dot blue"></span> Busy</span><strong id="busy">—</strong><span class="stat-detail">currently working</span></div>
+      <div class="stat"><span class="stat-label"><span class="dot gray"></span> Offline</span><strong id="offline">—</strong><span class="stat-detail">not connected</span></div>
+      <div class="stat"><span class="stat-label"><span class="dot amber"></span> Queued jobs</span><strong id="queued">—</strong><span class="stat-detail">waiting to start</span></div>
+    </section>
+    <div class="workspace-heading"><div><h2>Runner overview <span id="runner-count" class="count">0</span></h2><p id="scope">Connect to discover runners across your personal repositories and organizations.</p></div><div id="controls" hidden><button id="refresh" class="secondary">Refresh now</button><button id="disconnect" class="text-button">Disconnect</button></div></div>
+    <div class="dashboard">
+      <section class="runners-panel" aria-label="Self-hosted runners"><div id="runners"><div class="empty"><span class="empty-icon" aria-hidden="true">⌘</span><h3>A home for your runners</h3><p>Connect your account to see your self-hosted runners and their current workload.</p></div></div></section>
+      <aside class="queue-panel" aria-labelledby="queue-title"><div class="queue-heading"><h2 id="queue-title">Job queue <span id="job-count" class="count">0</span></h2><span class="small">Oldest first</span></div><p class="queue-note">Queued jobs show label matches, not assignments. Organization runner-group and workflow rules may restrict eligibility. GitHub assigns a runner when a job starts.</p><div id="jobs"><div class="empty queue-empty"><span class="empty-icon" aria-hidden="true">≡</span><h3>Nothing to show yet</h3><p>Your running and queued self-hosted jobs will appear here.</p></div></div></aside>
+    </div>
+    <footer><span>RUNNER WATCH <span class="footer-divider">/</span> Built for a quieter workflow.</span><span id="last-updated">No data loaded</span></footer>
+  </main>
+</body>
+</html>
